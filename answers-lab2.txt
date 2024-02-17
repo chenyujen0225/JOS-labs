@@ -1,0 +1,35 @@
+Question1:
+the variable x should have uintptr_t as its data type.
+
+Question2:
+Entry      Base Virtual Address      Points to (logically)
+1023       0xFFC00000                Page table for top 4MB phys memory
+1022       0xFF800000                .
+.          .                         .
+960        0xF0000000 (KSTACKTOP)    bootstack+KSTKSIZE
+959        0xEFc00000                BOOTSTACK
+958        0xEF800000
+957        0xEF400000 (UPVT)         kern_pgdir (read only)
+956        0xEF000000 (UPAGES)       pages (read only)
+.          .                         .
+2          0x00800000                UTEXT
+1          0x00400000                UTEMP
+0          0x00000000                beginning
+
+Question3:
+because the PTE_U is not able.
+so in some part, the user can not read or write the memory.
+processor will have fault and turn back to OS control to protect kernel memory.
+
+Question4:
+2GB,
+jos use 4MB space to store the page information structure, and each structure is 8byte. we can have 512K pages, and the page size is 4KB. so the maximum space is 512K * 4KB = 2GB.
+
+Question5:
+we need 4MB+2MB+4KB for the space.
+4MB for page information structure, 2MB for page tables, 4KB for page directory.
+
+Question6:
+After jmp *%eax finish, we transition to running at an EIP above KERNBASE.
+we can continue executing because the entry_pgdir map va[0-4M) to pa[0-4M).
+It is necessary because some instruction we execute may jump to a point above KERNBASE after paging is done and va[0-4M) will be abandoned later.

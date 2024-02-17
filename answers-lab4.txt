@@ -1,0 +1,18 @@
+question1:
+In boot.S, the paging mechanism has not been able yest, we can assign  the physical address where the program starts executing and the address where the program is loaded. In mpentry.S, the main cpu is already in protect mode, so it is not possible to direectly assign a physical address. Instead, we can provide a linear address and map it to the corresponding physical address.
+
+question2:
+During the transition from _alltraps to lock_kernel() in the code, the process has already switched to kernel mode but has not acquired the kernel lock yet. If another CPU enters the kernel at this point and uses the same kernel stack, the context information saved in _alltraps can be corrupted. Therefore, even with a large kernel stack, multiple CPUs should not use the same kernel stack. Similarly, the unlocking process also occurs in kernel mode, and during the period between unlocking and actually returning to user mode, the same situation described above can occur.
+When an interrupt occurs, the hardware automatically pushes
+
+uint32_t tf_err
+uint32_t tf_eip
+uint16_t tf_cs
+uint16_t tf_padding3
+uint32_t tf_eflags to kernel stack before checking the lock. So it will just mess up
+
+question3:
+Since the current execution is within the kernel of the operating system, each process's page table contains mappings for the kernel. In each process's page table, the virtual addresses above UTOP are the same, except for UVPT, which is different for each process. However, these mappings are not visible in user mode. Therefore, even though the page table is switched to the next process's page table during a context switch, the address of curenv and its mappings remain valid and unchanged.
+
+question4:
+Correctly saving and restoring the context is essential to ensure the proper restoration of the original environment. When switching between user processes, the system call sched_yield() is invoked. Transitions from user mode to kernel mode can occur through interrupts, exceptions, or system calls. In each of these cases, a TrapFrame representing the user mode is created on the system stack. After entering the trap() function, the statement curenv->env_tf = *tf; saves the state of the necessary registers on the kernel stack to the env_tf field of the user environment.
