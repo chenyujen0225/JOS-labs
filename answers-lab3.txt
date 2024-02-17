@@ -1,0 +1,11 @@
+question1
+answer: because different exceptions/interrupts have different solutions to solve it. without that, we can not easily provide protection.
+
+quesiton2
+answer: we should set the DPL to 3 to let users invoke int $14, but this wll let user interfere with memory management.
+
+question3
+answer: because we set DPL of T_BRKPT to 0 and we use int $3 in breakpoint, we got the general protection fault. we need to set DPL = 3 for breakpoint trap handler to work correctly.
+
+question4
+answer: protection to prevent user from invoking interrupt handlers and interfering with kernel.
